@@ -8,19 +8,22 @@ const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
+
+// Render provides PORT automatically; use 3000 locally.
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve frontend files
+// Serve frontend files from the public folder
 app.use(express.static(path.join(__dirname, "public")));
 
 // Basic API test
 app.get("/api", (req, res) => {
     res.json({
-        message: "TaskFlow API is running!"
+        message: "TaskFlow API is running!",
+        status: "success"
     });
 });
 
@@ -35,11 +38,8 @@ async function startServer() {
     try {
         await connectDB();
 
-        app.listen(PORT, () => {
-            console.log(
-                `TaskFlow server running at http://localhost:${PORT}`
-            );
-            console.log("MongoDB connected successfully!");
+        app.listen(PORT, "0.0.0.0", () => {
+            console.log(`TaskFlow server running on port ${PORT}`);
         });
     } catch (error) {
         console.error("Server startup failed:", error.message);
