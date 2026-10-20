@@ -1,28 +1,70 @@
 
 $(document).ready(function () {
-    const taskModal = new bootstrap.Modal(
-        document.getElementById("taskModal")
-    );
+    // 1. Check login token
+    const token = sessionStorage.getItem("taskflowToken");
+
+    if (!token) {
+        window.location.replace("/login.html");
+        return;
+    }
+
+    const taskModalElement = document.getElementById("taskModal");
+
+    if (!taskModalElement) {
+        console.error("Task modal not found in index.html");
+        return;
+    }
+
+    const taskModal = new bootstrap.Modal(taskModalElement);
 
     let tasks = [];
+    let sessionExpired = false;
 
-    try {
-        const savedTasks = JSON.parse(
-            localStorage.getItem("taskflow-demo-tasks") || "[]"
-        );
+    // 2. Centralized API request with JWT authentication
+    async function apiRequest(url, options = {}) {
+        const currentToken = sessionStorage.getItem("taskflowToken");
 
-        tasks = Array.isArray(savedTasks) ? savedTasks : [];
-    } catch {
-        tasks = [];
+        if (!currentToken) {
+            redirectToLogin();
+            throw new Error("Please log in to continue.");
+        }
+
+        const headers = {
+            ...(options.headers || {}),
+            Authorization: "Bearer " + currentToken
+        };
+
+        const response = await fetch(url, {
+            ...options,
+            headers
+        });
+
+        if (response.status === 401) {
+            redirectToLogin();
+            throw new Error("Your session has expired. Please log in again.");
+        }
+
+        return response;
     }
 
-    function saveTasks() {
-        localStorage.setItem(
-            "taskflow-demo-tasks",
-            JSON.stringify(tasks)
-        );
+    function redirectToLogin() {
+        sessionExpired = true;
+
+        sessionStorage.removeItem("taskflowToken");
+        sessionStorage.removeItem("taskflowUser");
+
+        window.location.replace("/login.html");
     }
 
+    async function readResponse(response) {
+        try {
+            return await response.json();
+        } catch {
+            return {};
+        }
+    }
+
+    // 3. Safely display user-provided text
     function escapeHTML(value) {
         return String(value ?? "").replace(/[&<>"']/g, function (char) {
             return {
@@ -35,14 +77,50 @@ $(document).ready(function () {
         });
     }
 
+    // 4. Load tasks for the authenticated user
+    async function loadTasks() {
+        try {
+            const response = await apiRequest("/api/tasks");
+
+            const data = await readResponse(response);
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to load tasks.");
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error("Unexpected response from the server.");
+            }
+
+            tasks = data;
+            renderTasks();
+
+        } catch (error) {
+            if (sessionExpired) return;
+
+            console.error("Error loading tasks:", error);
+
+            $("#taskContainer").empty();
+            $("#emptyMessage")
+                .text(error.message || "Unable to load tasks.")
+                .show();
+        }
+    }
+
+    // 5. Render tasks and dashboard statistics
     function renderTasks() {
-        const search = $("#searchTask").val().toLowerCase().trim();
-        const filter = $("#filterStatus").val();
+        const search = String($("#searchTask").val() || "")
+            .toLowerCase()
+            .trim();
+
+        const filter = $("#filterStatus").val() || "All";
 
         const filteredTasks = tasks.filter(function (task) {
+            const title = String(task.title || "").toLowerCase();
+            const description = String(task.description || "").toLowerCase();
+
             const matchesSearch =
-                task.title.toLowerCase().includes(search) ||
-                task.description.toLowerCase().includes(search);
+                title.includes(search) || description.includes(search);
 
             const matchesStatus =
                 filter === "All" || task.status === filter;
@@ -51,22 +129,29 @@ $(document).ready(function () {
         });
 
         $("#totalTasks").text(tasks.length);
+
         $("#pendingTasks").text(
-            tasks.filter(t => t.status === "Pending").length
-        );
-        $("#progressTasks").text(
-            tasks.filter(t => t.status === "In Progress").length
-        );
-        $("#completedTasks").text(
-            tasks.filter(t => t.status === "Completed").length
+            tasks.filter(task => task.status === "Pending").length
         );
 
-        $("#emptyMessage").toggle(filteredTasks.length === 0);
+        $("#progressTasks").text(
+            tasks.filter(task => task.status === "In Progress").length
+        );
+
+        $("#completedTasks").text(
+            tasks.filter(task => task.status === "Completed").length
+        );
 
         if (tasks.length === 0) {
-            $("#emptyMessage").text("No tasks yet. Add your first task!");
+            $("#emptyMessage")
+                .text("No tasks yet. Add your first task!")
+                .show();
         } else if (filteredTasks.length === 0) {
-            $("#emptyMessage").text("No tasks match your search or filter.");
+            $("#emptyMessage")
+                .text("No tasks match your search or filter.")
+                .show();
+        } else {
+            $("#emptyMessage").hide();
         }
 
         $("#taskContainer").html(
@@ -75,9 +160,16 @@ $(document).ready(function () {
                 const safeDescription = escapeHTML(task.description);
                 const safePriority = escapeHTML(task.priority);
                 const safeStatus = escapeHTML(task.status);
-                const safeDate = escapeHTML(task.dueDate || "No due date");
+                const safeId = escapeHTML(task._id);
 
-                const statusClass = task.status.replace(/\s+/g, "-");
+                const dueDate = task.dueDate
+                    ? String(task.dueDate).slice(0, 10)
+                    : "No due date";
+
+                const safeDate = escapeHTML(dueDate);
+
+                const statusClass = String(task.status || "")
+                    .replace(/\s+/g, "-");
 
                 return `
                     <article class="task-card">
@@ -103,13 +195,17 @@ $(document).ready(function () {
                         </p>
 
                         <div class="task-actions">
-                            <button class="btn btn-sm btn-outline-primary edit-task"
-                                data-id="${task.id}">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary edit-task"
+                                data-id="${safeId}">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
 
-                            <button class="btn btn-sm btn-outline-danger delete-task"
-                                data-id="${task.id}">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger delete-task"
+                                data-id="${safeId}">
                                 <i class="bi bi-trash"></i> Delete
                             </button>
                         </div>
@@ -119,18 +215,25 @@ $(document).ready(function () {
         );
     }
 
+    // 6. Reset task form
     function resetForm() {
         $("#taskForm")[0].reset();
         $("#taskId").val("");
         $("#modalTitle").text("Create New Task");
     }
 
+    function getTaskById(id) {
+        return tasks.find(task => task._id === id);
+    }
+
+    // 7. Open create-task modal
     $("#openTaskForm").on("click", function () {
         resetForm();
         taskModal.show();
     });
 
-    $("#taskForm").on("submit", function (event) {
+    // 8. Create or update a task
+    $("#taskForm").on("submit", async function (event) {
         event.preventDefault();
 
         const title = $("#taskTitle").val().trim();
@@ -143,64 +246,113 @@ $(document).ready(function () {
         const taskId = $("#taskId").val();
 
         const taskData = {
-            id: taskId || (
-                window.crypto && crypto.randomUUID
-                    ? crypto.randomUUID()
-                    : Date.now().toString()
-            ),
             title: title,
             description: $("#taskDescription").val().trim(),
             priority: $("#taskPriority").val(),
             status: $("#taskStatus").val(),
-            dueDate: $("#taskDueDate").val()
+            dueDate: $("#taskDueDate").val() || null
         };
 
-        if (taskId) {
-            tasks = tasks.map(function (task) {
-                return task.id === taskId ? taskData : task;
-            });
-        } else {
-            tasks.unshift(taskData);
-        }
+        const submitButton = $(this).find('[type="submit"]');
+        submitButton.prop("disabled", true);
 
-        saveTasks();
-        renderTasks();
-        taskModal.hide();
-        resetForm();
+        try {
+            const url = taskId
+                ? `/api/tasks/${encodeURIComponent(taskId)}`
+                : "/api/tasks";
+
+            const response = await apiRequest(url, {
+                method: taskId ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(taskData)
+            });
+
+            const result = await readResponse(response);
+
+            if (!response.ok) {
+                throw new Error(result.message || "Unable to save task.");
+            }
+
+            await loadTasks();
+
+            if (sessionExpired) return;
+
+            taskModal.hide();
+            resetForm();
+
+        } catch (error) {
+            if (sessionExpired) return;
+
+            console.error("Error saving task:", error);
+            alert(error.message || "Unable to save task.");
+        } finally {
+            submitButton.prop("disabled", false);
+        }
     });
 
+    // 9. Edit task
     $("#taskContainer").on("click", ".edit-task", function () {
-        const task = tasks.find(
-            t => t.id === $(this).attr("data-id")
-        );
+        const task = getTaskById($(this).attr("data-id"));
 
         if (!task) return;
 
-        $("#taskId").val(task.id);
+        $("#taskId").val(task._id);
         $("#taskTitle").val(task.title);
-        $("#taskDescription").val(task.description);
+        $("#taskDescription").val(task.description || "");
         $("#taskPriority").val(task.priority);
         $("#taskStatus").val(task.status);
-        $("#taskDueDate").val(task.dueDate);
+
+        $("#taskDueDate").val(
+            task.dueDate ? String(task.dueDate).slice(0, 10) : ""
+        );
 
         $("#modalTitle").text("Edit Task");
         taskModal.show();
     });
 
-    $("#taskContainer").on("click", ".delete-task", function () {
+    // 10. Delete task
+    $("#taskContainer").on("click", ".delete-task", async function () {
         const taskId = $(this).attr("data-id");
 
         if (!confirm("Are you sure you want to delete this task?")) {
             return;
         }
 
-        tasks = tasks.filter(task => task.id !== taskId);
+        try {
+            const response = await apiRequest(
+                `/api/tasks/${encodeURIComponent(taskId)}`,
+                { method: "DELETE" }
+            );
 
-        saveTasks();
-        renderTasks();
+            const result = await readResponse(response);
+
+            if (!response.ok) {
+                throw new Error(result.message || "Unable to delete task.");
+            }
+
+            await loadTasks();
+
+        } catch (error) {
+            if (sessionExpired) return;
+
+            console.error("Error deleting task:", error);
+            alert(error.message || "Unable to delete task.");
+        }
     });
 
+    // 11. Search and status filtering
     $("#searchTask, #filterStatus").on("input change", renderTasks);
 
-    renderTasks();
+    // 12. Logout
+    $("#logoutButton").on("click", function () {
+        sessionStorage.removeItem("taskflowToken");
+        sessionStorage.removeItem("taskflowUser");
+
+        window.location.replace("/login.html");
+    });
+
+    // 13. Load tasks on dashboard startup
+    loadTasks();
 });
