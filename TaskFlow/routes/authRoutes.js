@@ -7,6 +7,28 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+// Validate email format
+const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+// Generate JWT token safely
+const generateToken = (userId) => {
+    if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is missing from environment variables");
+    }
+
+    // Use a valid default if JWT_EXPIRES_IN is not configured.
+    // Examples: 60, "15m", "1h", "7d"
+    const expiresIn = process.env.JWT_EXPIRES_IN || "1h";
+
+    return jwt.sign(
+        { userId: userId.toString() },
+        process.env.JWT_SECRET,
+        { expiresIn }
+    );
+};
+
 // ===============================
 // REGISTER A NEW USER
 // POST /api/auth/register
@@ -34,14 +56,12 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Validate email
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        if (!isValidEmail(cleanEmail)) {
             return res.status(400).json({
                 message: "Please enter a valid email address."
             });
         }
 
-        // Validate password
         if (
             password.length < 8 ||
             Buffer.byteLength(password, "utf8") > 72
@@ -51,7 +71,6 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Check duplicate email
         const existingUser = await User.findOne({
             email: cleanEmail
         });
@@ -62,7 +81,6 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Hash password before saving
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const user = await User.create({
@@ -126,6 +144,13 @@ router.post("/login", async (req, res) => {
             });
         }
 
+        if (!user.password) {
+            console.error("Login failed: password hash is missing for user.");
+            return res.status(500).json({
+                message: "Unable to authenticate this account."
+            });
+        }
+
         const passwordMatches = await bcrypt.compare(
             password,
             user.password
@@ -137,23 +162,7 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        if (!process.env.JWT_SECRET) {
-            console.error("JWT_SECRET is missing from .env");
-
-            return res.status(500).json({
-                message: "Authentication configuration error."
-            });
-        }
-
-        const token = jwt.sign(
-            {
-                userId: user._id.toString()
-            },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: process.env.JWT_EXPIRES_IN || "1h"
-            }
-        );
+        const token = generateToken(user._id);
 
         return res.status(200).json({
             message: "Login successful.",
@@ -180,6 +189,7 @@ router.post("/login", async (req, res) => {
 // ===============================
 router.get("/me", authMiddleware, async (req, res) => {
     try {
+        // The existing auth middleware should set req.user.id.
         const user = await User.findById(req.user.id)
             .select("name email createdAt");
 
@@ -234,13 +244,12 @@ router.put("/me", authMiddleware, async (req, res) => {
             });
         }
 
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        if (!isValidEmail(cleanEmail)) {
             return res.status(400).json({
                 message: "Please enter a valid email address."
             });
         }
 
-        // Prevent changing to another user's email
         const existingUser = await User.findOne({
             email: cleanEmail,
             _id: { $ne: req.user.id }
