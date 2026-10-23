@@ -7,32 +7,42 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Validate email format
+// ======================================
+// EMAIL VALIDATION
+// ======================================
 const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
-// Generate JWT token safely
+// ======================================
+// GENERATE JWT TOKEN
+// ======================================
 const generateToken = (userId) => {
-    if (!process.env.JWT_SECRET) {
-        throw new Error("JWT_SECRET is missing from environment variables");
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+        throw new Error("JWT_SECRET is missing from environment variables.");
     }
 
-    // Use a valid default if JWT_EXPIRES_IN is not configured.
-    // Examples: 60, "15m", "1h", "7d"
-    const expiresIn = process.env.JWT_EXPIRES_IN || "1h";
+    // Configure JWT_EXPIRES_IN in Render as 1h, 15m, or 7d.
+    const configuredExpiry = process.env.JWT_EXPIRES_IN?.trim();
+    const expiresIn = configuredExpiry || "1h";
 
     return jwt.sign(
-        { userId: userId.toString() },
-        process.env.JWT_SECRET,
-        { expiresIn }
+        {
+            userId: userId.toString()
+        },
+        secret,
+        {
+            expiresIn
+        }
     );
 };
 
-// ===============================
-// REGISTER A NEW USER
+// ======================================
+// REGISTER
 // POST /api/auth/register
-// ===============================
+// ======================================
 router.post("/register", async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -67,7 +77,8 @@ router.post("/register", async (req, res) => {
             Buffer.byteLength(password, "utf8") > 72
         ) {
             return res.status(400).json({
-                message: "Password must be at least 8 characters and no more than 72 UTF-8 bytes."
+                message:
+                    "Password must be at least 8 characters and no more than 72 UTF-8 bytes."
             });
         }
 
@@ -113,10 +124,10 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// ===============================
-// LOG IN
+// ======================================
+// LOGIN
 // POST /api/auth/login
-// ===============================
+// ======================================
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -145,7 +156,8 @@ router.post("/login", async (req, res) => {
         }
 
         if (!user.password) {
-            console.error("Login failed: password hash is missing for user.");
+            console.error("Login failed: password hash is missing.");
+
             return res.status(500).json({
                 message: "Unable to authenticate this account."
             });
@@ -183,13 +195,12 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// ===============================
+// ======================================
 // GET LOGGED-IN USER PROFILE
 // GET /api/auth/me
-// ===============================
+// ======================================
 router.get("/me", authMiddleware, async (req, res) => {
     try {
-        // The existing auth middleware should set req.user.id.
         const user = await User.findById(req.user.id)
             .select("name email createdAt");
 
@@ -218,10 +229,10 @@ router.get("/me", authMiddleware, async (req, res) => {
     }
 });
 
-// ===============================
+// ======================================
 // UPDATE LOGGED-IN USER PROFILE
 // PUT /api/auth/me
-// ===============================
+// ======================================
 router.put("/me", authMiddleware, async (req, res) => {
     try {
         const { name, email } = req.body;
