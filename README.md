@@ -1,99 +1,179 @@
-# TaskFlow – Task Management Application
+# 🚀 TaskFlow — Task Management System
 
-TaskFlow is a task management application designed to help users organize their work, manage daily tasks, and track task progress efficiently. It provides a simple and user-friendly way to stay organized and improve productivity.
+A modern, responsive task management web application designed to help users organize their daily tasks, manage priorities, and track progress efficiently.
 
-## 🚀 Features
+🔗 **Live Demo:** https://taskflow-mx7s.onrender.com
 
-- Create and manage tasks
-- View and organize task lists
-- Update task details
-- Track task progress and status
-- Delete completed or unnecessary tasks
-- Simple and user-friendly interface
-- Organized project structure
+💻 **GitHub Repository:** https://github.com/sanket2407kadam/TaskFlow
 
-## 🛠️ Technologies Used
+---
 
-Update this section according to the technologies actually used in your project.
+## ✨ Features
 
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB (if configured)
-- **Version Control:** Git and GitHub
+- 🔐 **User Authentication** — Secure registration and login.
+- 🔑 **JWT Authentication** — Token-based authentication for protected routes.
+- 📋 **Task Management** — Create, view, update, and delete tasks.
+- 🎯 **Priority Management** — Organize tasks by Low, Medium, and High priority.
+- 📊 **Task Tracking** — Track Pending, In Progress, and Completed tasks.
+- 👤 **Profile Management** — View and update personal profile information.
+- 🗄️ **Database Integration** — Store user and task information in MongoDB.
+- 🌙 **Modern Dark UI** — Attractive dashboard with a dark theme and colorful accents.
+- 📱 **Responsive Design** — Designed to work across desktop and mobile screens.
 
-## 📁 Project Structure
+---
+
+## 🛠️ Tech Stack
+
+**Frontend**
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap
+- Tailwind CSS
+- Bootstrap Icons
+
+**Backend**
+- Node.js
+- Express.js
+
+**Database**
+- MongoDB
+- Mongoose
+
+**Authentication & Security**
+- JSON Web Token (JWT)
+- bcryptjs
+
+**Tools & Deployment**
+- Git and GitHub
+- Postman
+- MongoDB Compass
+- Render
+
+---
+
+## 📂 Project Structure
 
 ```text
 TaskFlow/
-├── public/             # Static assets
-├── src/                # Application source code (if used)
-├── routes/             # Application routes (if used)
-├── models/             # Database models (if used)
-├── views/              # Frontend templates (if used)
+├── config/
+│   └── db.js
+├── middleware/
+│   └── authMiddleware.js
+├── models/
+│   ├── Task.js
+│   └── User.js
+├── routes/
+│   ├── authRoutes.js
+│   └── taskRoutes.js
+├── public/
+│   ├── css/
+│   ├── js/
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   └── profile.html
+├── .env
 ├── .gitignore
 ├── package.json
 ├── package-lock.json
-├── server.js           # Application entry point (if used)
+├── server.js
 └── README.md
 ```
 
-*Note: The structure above is an example. Adjust it to match your actual project files.*
+---
 
 ## ⚙️ Installation and Setup
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/sanket2407kadam/TaskFlow.git
 ```
 
-### 2. Navigate to the project directory
+### 2. Navigate to the Project Folder
 
 ```bash
 cd TaskFlow
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 4. Configure environment variables
+### 4. Configure Environment Variables
 
-If your project uses environment variables, create a `.env` file and configure the required values. Never commit passwords, API keys, or other secrets.
+Create a `.env` file in the project root directory:
 
-### 5. Run the application
+```env
+PORT=3000
+MONGODB_URI=mongodb://127.0.0.1:27017/taskflow
+JWT_SECRET=your_secure_secret_key
+```
 
-Use the start command configured in your `package.json`. For example:
+Replace the example JWT secret with a strong, private secret. Configure `MONGODB_URI` for your local MongoDB instance or your hosted database.
+
+**Important:** Never upload your actual `.env` file or JWT secret to GitHub.
+
+### 5. Start the Application
+
+For development:
+
+```bash
+npm run dev
+```
+
+Or start normally:
 
 ```bash
 npm start
 ```
 
-If your project uses a different script, use the corresponding command.
+### 6. Open in Your Browser
 
-## 🎯 Project Objective
+```text
+http://localhost:3000
+```
 
-The objective of TaskFlow is to simplify task organization and progress tracking through a practical application that demonstrates web development concepts, application structure, and task management workflows.
+Make sure MongoDB is running and your environment variables are configured correctly.
 
-## 🔮 Future Improvements
+---
 
-- User registration and login
-- Task priorities and deadlines
-- Search and filtering
-- Task categories
-- Dashboard with task statistics
-- Responsive design improvements
-- Notifications and reminders
+## 🔒 Security
+
+- Password hashing using bcryptjs.
+- JWT-based authentication.
+- Protected task API routes.
+- User-specific task access.
+- Environment variables for sensitive configuration.
+
+---
+
+## 🌐 Live Application
+
+Try TaskFlow here:
+
+👉 https://taskflow-mx7s.onrender.com
+
+If the hosted application takes a little time to respond, the hosting service may be starting the application after a period of inactivity.
+
+---
 
 ## 👨‍💻 Developer
 
 **Sanket Kadam**
 
-- GitHub: [@sanket2407kadam](https://github.com/sanket2407kadam)
-- LinkedIn: [Sanket Kadam](https://linkedin.com/in/sanket-kadam2004)
+- GitHub: https://github.com/sanket2407kadam
+- LinkedIn: https://linkedin.com/in/sanket-kadam2004
 
-## 📄 License
+---
 
-This project is available for learning and portfolio purposes. Add an open-source license if you intend to distribute it under specific reuse terms.
+## 🎯 Project Goal
+
+TaskFlow was built to gain practical experience in full-stack web development, REST API development, authentication, database integration, CRUD operations, and deployment.
+
+**Built with 💙 and a passion for learning and building real-world applications.**
+
+⭐ If you find this project useful, consider giving the repository a star!
