@@ -4,271 +4,794 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0d12">
+
     <title>My Profile | TaskFlow</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0b0d12;
+            --panel: #141722;
+            --border: #2b3040;
+            --text: #f3f4f8;
+            --muted: #9ca3b4;
+            --purple: #8b5cf6;
+            --cyan: #22d3ee;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
         body {
-            background: #f4f7fb;
-            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 84px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(ellipse at 10% 0%, rgba(139,92,246,.14), transparent 38%),
+                radial-gradient(ellipse at 95% 85%, rgba(34,211,238,.07), transparent 32%),
+                var(--bg);
         }
 
+        /* FIXED NAVBAR */
         .navbar {
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            width: 100%;
+            min-height: 76px;
+            padding: 12px 0;
+            background: rgba(18,21,30,.97);
+            border-bottom: 1px solid rgba(139,92,246,.28);
+            box-shadow: 0 8px 30px rgba(0,0,0,.25);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
+        .navbar .container {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .navbar-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+            color: #f9fafb !important;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -.7px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .navbar-brand:hover {
+            color: #fff !important;
+        }
+
+        .brand-icon {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            color: #fff;
+            background: linear-gradient(135deg, #8b5cf6, #6251d9);
+            box-shadow: 0 6px 18px rgba(139,92,246,.25);
+            font-size: 19px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            min-width: 0;
+            flex-shrink: 0;
+        }
+
+        .navbar-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 41px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            text-decoration: none;
+            transition: background .2s ease, border-color .2s ease, transform .2s ease;
+        }
+
+        .navbar-actions .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .navbar-actions .dashboard-btn {
+            border: 1px solid rgba(167,139,250,.5);
+            background: rgba(139,92,246,.12);
+            color: #ddd6fe;
+        }
+
+        .navbar-actions .dashboard-btn:hover {
+            border-color: #a78bfa;
+            background: rgba(139,92,246,.22);
+            color: #fff;
+        }
+
+        .navbar-actions .logout-btn {
+            border: 1px solid rgba(251,113,133,.45);
+            background: rgba(251,113,133,.07);
+            color: #fda4af;
+        }
+
+        .navbar-actions .logout-btn:hover {
+            border-color: #fb7185;
+            background: rgba(251,113,133,.16);
+            color: #fff;
+        }
+
+        /* PROFILE CARD */
         .profile-card {
-            max-width: 650px;
-            margin: 45px auto;
-            background: #fff;
-            border-radius: 18px;
-            padding: 32px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+            position: relative;
+            max-width: 720px;
+            margin: 38px auto;
+            padding: 36px;
+            overflow: hidden;
+            border: 1px solid rgba(139,92,246,.3);
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at top right, rgba(139,92,246,.12), transparent 35%),
+                radial-gradient(circle at bottom left, rgba(34,211,238,.05), transparent 32%),
+                rgba(20,23,34,.97);
+            box-shadow: 0 24px 70px rgba(0,0,0,.3);
+            animation: appear .45s ease-out;
+        }
+
+        .profile-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12%;
+            right: 12%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8b5cf6, #22d3ee, transparent);
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .profile-icon {
-            width: 85px;
-            height: 85px;
-            margin: 0 auto 15px;
-            border-radius: 50%;
-            background: #e8efff;
-            color: #2563eb;
             display: flex;
+            width: 88px;
+            height: 88px;
             align-items: center;
             justify-content: center;
-            font-size: 38px;
+            margin: 0 auto 18px;
+            border: 1px solid rgba(139,92,246,.45);
+            border-radius: 25px;
+            color: #e9ddff;
+            background: linear-gradient(145deg, #30224f, #1a1d2b);
+            font-size: 42px;
+            box-shadow: 0 12px 30px rgba(139,92,246,.16);
+            transition: transform .25s ease, box-shadow .25s ease;
         }
 
+        .profile-icon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 34px rgba(139,92,246,.24);
+        }
+
+        .profile-card h1 {
+            margin-bottom: 10px;
+            color: #f9fafb;
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: -.9px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .profile-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 14px;
+            padding: 8px 12px;
+            border: 1px solid rgba(34,211,238,.2);
+            border-radius: 999px;
+            background: rgba(34,211,238,.07);
+            color: #67e8f9;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 28px 0 20px;
+            padding-bottom: 13px;
+            border-bottom: 1px solid var(--border);
+            color: #e5e7eb;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .section-heading i {
+            color: #a78bfa;
+            font-size: 17px;
+        }
+
+        /* FORM */
         .form-label {
+            margin-bottom: 9px;
+            color: #d9dce7;
+            font-size: 13px;
             font-weight: 600;
         }
 
+        .form-control {
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #34394a;
+            border-radius: 11px;
+            background: #10131c;
+            color: var(--text);
+            font-size: 14px;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .form-control::placeholder {
+            color: #737b90;
+        }
+
+        .form-control:hover {
+            border-color: #50566d;
+        }
+
+        .form-control:focus {
+            border-color: var(--purple);
+            background: #10131c;
+            color: #fff;
+            box-shadow: 0 0 0 .2rem rgba(139,92,246,.16);
+        }
+
+        .account-info {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: linear-gradient(120deg, rgba(139,92,246,.07), rgba(34,211,238,.025));
+            transition: border-color .2s ease;
+        }
+
+        .account-info:hover {
+            border-color: rgba(139,92,246,.45);
+        }
+
+        .account-info-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 9px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .account-info-label i {
+            color: #a78bfa;
+        }
+
+        .account-info-value {
+            color: #e5e7eb;
+            font-size: 14px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        /* BUTTONS */
+        .btn {
+            min-height: 42px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: .7;
+            cursor: wait;
+            transform: none;
+        }
+
         .btn-primary {
-            background: #2563eb;
-            border-color: #2563eb;
+            border-color: var(--purple) !important;
+            background: linear-gradient(135deg, #8b5cf6, #6d4aff) !important;
+            color: #fff !important;
+            box-shadow: 0 6px 18px rgba(139,92,246,.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9b72ff, #7958ff) !important;
+        }
+
+        .btn-outline-secondary {
+            border-color: #454b5e !important;
+            color: #c4cad8 !important;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #252938 !important;
+            color: #fff !important;
+        }
+
+        .alert {
+            border: 1px solid;
+            border-radius: 11px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .alert-success {
+            border-color: rgba(52,211,153,.3);
+            background: rgba(52,211,153,.1);
+            color: #a7f3d0;
+        }
+
+        .alert-danger {
+            border-color: rgba(251,113,133,.3);
+            background: rgba(251,113,133,.1);
+            color: #fecdd3;
+        }
+
+        .alert-warning {
+            border-color: rgba(251,191,36,.3);
+            background: rgba(251,191,36,.1);
+            color: #fde68a;
+        }
+
+        .loading-text {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .spinner-border {
+            color: #a78bfa !important;
+        }
+
+        .page-footer {
+            padding: 0 15px 26px;
+            color: #697287;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        /* RESPONSIVE NAVBAR */
+        @media (max-width: 576px) {
+            body {
+                padding-top: 68px;
+            }
+
+            .navbar {
+                min-height: 68px;
+                padding: 9px 0;
+            }
+
+            .navbar .container {
+                gap: 8px;
+                padding-left: 13px;
+                padding-right: 13px;
+            }
+
+            .navbar-brand {
+                gap: 7px;
+                font-size: 17px;
+                letter-spacing: -.4px;
+            }
+
+            .brand-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 10px;
+                font-size: 16px;
+            }
+
+            .navbar-actions {
+                gap: 6px;
+            }
+
+            .navbar-actions .btn {
+                min-height: 35px;
+                gap: 5px;
+                padding: 6px 8px;
+                border-radius: 8px;
+                font-size: 10px;
+            }
+
+            .navbar-actions .btn i {
+                font-size: 11px;
+            }
+
+            .profile-card {
+                margin: 24px auto;
+                padding: 27px 19px;
+                border-radius: 19px;
+            }
+
+            .profile-card h1 {
+                font-size: 25px;
+            }
+
+            .profile-icon {
+                width: 76px;
+                height: 76px;
+                border-radius: 22px;
+                font-size: 36px;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+            }
+
+            .profile-actions .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .navbar-brand {
+                gap: 5px;
+                font-size: 15px;
+            }
+
+            .brand-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+
+            .navbar-actions {
+                gap: 4px;
+            }
+
+            .navbar-actions .btn {
+                gap: 4px;
+                padding: 6px;
+                font-size: 9px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="/index.html">
-            <i class="bi bi-check2-square"></i> TaskFlow
-        </a>
+    <!-- Fixed Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top" aria-label="Main navigation">
+        <div class="container">
 
-        <div class="d-flex gap-2">
-            <a href="/index.html" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-speedometer2"></i> Dashboard
+            <a class="navbar-brand" href="/index.html" aria-label="TaskFlow home">
+                <span class="brand-icon">
+                    <i class="bi bi-check2-square" aria-hidden="true"></i>
+                </span>
+                <span>TaskFlow</span>
             </a>
 
-            <button id="logoutButton" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
-        </div>
-    </div>
-</nav>
+            <div class="navbar-actions">
+                <a href="/index.html" class="btn dashboard-btn">
+                    <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                </a>
 
-<main class="container">
-    <section class="profile-card">
-
-        <div class="text-center mb-4">
-            <div class="profile-icon">
-                <i class="bi bi-person-fill"></i>
-            </div>
-
-            <h2 class="fw-bold">My Profile</h2>
-            <p class="text-secondary">View and update your account information.</p>
-        </div>
-
-        <div id="messageBox" class="alert d-none" role="alert"></div>
-
-        <div id="loadingMessage" class="text-center py-3">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2">Loading your profile...</p>
-        </div>
-
-        <form id="profileForm" class="d-none">
-
-            <div class="mb-3">
-                <label for="profileName" class="form-label">Full Name</label>
-                <input type="text" id="profileName" class="form-control"
-                       minlength="2" maxlength="50" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="profileEmail" class="form-label">Email Address</label>
-                <input type="email" id="profileEmail" class="form-control"
-                       maxlength="254" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Account Created</label>
-                <p id="createdAt" class="text-secondary mb-0">—</p>
-            </div>
-
-            <div class="d-flex gap-2 mt-4">
-                <button type="submit" id="saveButton" class="btn btn-primary">
-                    <i class="bi bi-check-circle"></i> Save Changes
-                </button>
-
-                <button type="button" id="resetButton"
-                        class="btn btn-outline-secondary">
-                    Cancel
+                <button id="logoutButton" type="button" class="btn logout-btn">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    <span>Logout</span>
                 </button>
             </div>
-        </form>
 
-    </section>
-</main>
+        </div>
+    </nav>
 
-<script>
-    const token = sessionStorage.getItem("taskflowToken");
+    <!-- Main Content -->
+    <main class="container px-3">
+        <section class="profile-card">
 
-    const profileForm = document.getElementById("profileForm");
-    const loadingMessage = document.getElementById("loadingMessage");
-    const messageBox = document.getElementById("messageBox");
-    const saveButton = document.getElementById("saveButton");
+            <header class="text-center mb-4">
+                <div class="profile-icon">
+                    <i class="bi bi-person-fill" aria-hidden="true"></i>
+                </div>
 
-    const nameInput = document.getElementById("profileName");
-    const emailInput = document.getElementById("profileEmail");
-    const createdAt = document.getElementById("createdAt");
+                <h1>My Profile</h1>
 
-    let originalProfile = {};
+                <p class="subtitle mb-0">
+                    Manage your personal information and account details.
+                </p>
 
-    function showMessage(message, type = "success") {
-        messageBox.textContent = message;
-        messageBox.className = "alert alert-" + type;
-    }
+                <span class="profile-tag">
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    Account Settings
+                </span>
+            </header>
 
-    function hideMessage() {
-        messageBox.textContent = "";
-        messageBox.className = "alert d-none";
-    }
+            <div id="messageBox"
+                 class="alert d-none"
+                 role="alert"
+                 aria-live="polite"></div>
 
-    async function apiRequest(url, options = {}) {
-        const response = await fetch(url, {
-            ...options,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token,
-                ...(options.headers || {})
+            <div id="loadingMessage" class="text-center py-4">
+                <div class="spinner-border" role="status" aria-label="Loading"></div>
+                <p class="loading-text mt-3 mb-0">Loading your profile...</p>
+            </div>
+
+            <form id="profileForm" class="d-none">
+
+                <h2 class="section-heading">
+                    <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                    Personal Information
+                </h2>
+
+                <div class="mb-3">
+                    <label for="profileName" class="form-label">Full Name</label>
+                    <input type="text"
+                           id="profileName"
+                           name="name"
+                           class="form-control"
+                           placeholder="Enter your full name"
+                           minlength="2"
+                           maxlength="50"
+                           autocomplete="name"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="profileEmail" class="form-label">Email Address</label>
+                    <input type="email"
+                           id="profileEmail"
+                           name="email"
+                           class="form-control"
+                           placeholder="you@example.com"
+                           maxlength="254"
+                           autocomplete="email"
+                           required>
+                </div>
+
+                <h2 class="section-heading">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                    Account Information
+                </h2>
+
+                <div class="account-info mb-4">
+                    <div class="account-info-label">
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        Account Created
+                    </div>
+                    <div id="createdAt" class="account-info-value">—</div>
+                </div>
+
+                <div class="profile-actions d-flex gap-2 mt-4">
+                    <button type="submit" id="saveButton" class="btn btn-primary px-4">
+                        <i class="bi bi-check-circle me-1" aria-hidden="true"></i>
+                        Save Changes
+                    </button>
+
+                    <button type="button" id="resetButton" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i>
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        TaskFlow · Stay organized. Get things done.
+    </footer>
+
+    <script>
+        "use strict";
+
+        const token = sessionStorage.getItem("taskflowToken");
+
+        const profileForm = document.getElementById("profileForm");
+        const loadingMessage = document.getElementById("loadingMessage");
+        const messageBox = document.getElementById("messageBox");
+        const saveButton = document.getElementById("saveButton");
+
+        const nameInput = document.getElementById("profileName");
+        const emailInput = document.getElementById("profileEmail");
+        const createdAt = document.getElementById("createdAt");
+
+        let originalProfile = {
+            name: "",
+            email: ""
+        };
+
+        function showMessage(message, type = "success") {
+            messageBox.textContent = message;
+            messageBox.className = "alert alert-" + type;
+        }
+
+        function hideMessage() {
+            messageBox.textContent = "";
+            messageBox.className = "alert d-none";
+        }
+
+        async function apiRequest(url, options = {}) {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token,
+                    ...(options.headers || {})
+                }
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (response.status === 401) {
+                sessionStorage.removeItem("taskflowToken");
+                sessionStorage.removeItem("taskflowUser");
+                window.location.href = "/login.html";
+                throw new Error("Your session has expired. Please log in again.");
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || "Something went wrong.");
+            }
+
+            return data;
+        }
+
+        function fillProfile(user) {
+            originalProfile = {
+                name: user.name || "",
+                email: user.email || ""
+            };
+
+            nameInput.value = originalProfile.name;
+            emailInput.value = originalProfile.email;
+
+            if (user.createdAt) {
+                const date = new Date(user.createdAt);
+                createdAt.textContent = Number.isNaN(date.getTime())
+                    ? "Not available"
+                    : date.toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    });
+            } else {
+                createdAt.textContent = "Not available";
+            }
+
+            profileForm.classList.remove("d-none");
+            loadingMessage.classList.add("d-none");
+        }
+
+        async function loadProfile() {
+            if (!token) {
+                window.location.href = "/login.html";
+                return;
+            }
+
+            try {
+                const data = await apiRequest("/api/auth/me");
+                const user = data.user || data;
+
+                fillProfile(user);
+                sessionStorage.setItem("taskflowUser", JSON.stringify(user));
+            } catch (error) {
+                loadingMessage.classList.add("d-none");
+                showMessage(error.message || "Unable to load your profile.", "danger");
+            }
+        }
+
+        profileForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            hideMessage();
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim().toLowerCase();
+
+            if (name.length < 2 || name.length > 50) {
+                showMessage("Name must contain 2 to 50 characters.", "warning");
+                nameInput.focus();
+                return;
+            }
+
+            if (!emailInput.checkValidity()) {
+                showMessage("Please enter a valid email address.", "warning");
+                emailInput.focus();
+                return;
+            }
+
+            saveButton.disabled = true;
+            saveButton.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...';
+
+            try {
+                const data = await apiRequest("/api/auth/me", {
+                    method: "PUT",
+                    body: JSON.stringify({ name, email })
+                });
+
+                const user = data.user || data;
+
+                fillProfile(user);
+                sessionStorage.setItem("taskflowUser", JSON.stringify(user));
+
+                showMessage(data.message || "Profile updated successfully!", "success");
+            } catch (error) {
+                showMessage(error.message || "Unable to update your profile.", "danger");
+            } finally {
+                saveButton.disabled = false;
+                saveButton.innerHTML =
+                    '<i class="bi bi-check-circle me-1" aria-hidden="true"></i>Save Changes';
             }
         });
 
-        const data = await response.json().catch(() => ({}));
+        document.getElementById("resetButton").addEventListener("click", function() {
+            nameInput.value = originalProfile.name;
+            emailInput.value = originalProfile.email;
+            hideMessage();
+        });
 
-        if (response.status === 401) {
+        document.getElementById("logoutButton").addEventListener("click", function() {
             sessionStorage.removeItem("taskflowToken");
             sessionStorage.removeItem("taskflowUser");
             window.location.href = "/login.html";
-            throw new Error("Your session has expired. Please log in again.");
-        }
+        });
 
-        if (!response.ok) {
-            throw new Error(data.message || "Something went wrong.");
-        }
-
-        return data;
-    }
-
-    function fillProfile(user) {
-        originalProfile = {
-            name: user.name || "",
-            email: user.email || ""
-        };
-
-        nameInput.value = originalProfile.name;
-        emailInput.value = originalProfile.email;
-
-        createdAt.textContent = user.createdAt
-            ? new Date(user.createdAt).toLocaleDateString()
-            : "Not available";
-
-        profileForm.classList.remove("d-none");
-        loadingMessage.classList.add("d-none");
-    }
-
-    async function loadProfile() {
-        if (!token) {
-            window.location.href = "/login.html";
-            return;
-        }
-
-        try {
-            const data = await apiRequest("/api/auth/me");
-            const user = data.user || data;
-
-            fillProfile(user);
-            sessionStorage.setItem("taskflowUser", JSON.stringify(user));
-        } catch (error) {
-            loadingMessage.classList.add("d-none");
-            showMessage(error.message, "danger");
-        }
-    }
-
-    profileForm.addEventListener("submit", async function(event) {
-        event.preventDefault();
-        hideMessage();
-
-        const name = nameInput.value.trim();
-        const email = emailInput.value.trim().toLowerCase();
-
-        if (name.length < 2 || name.length > 50) {
-            showMessage("Name must contain 2 to 50 characters.", "warning");
-            return;
-        }
-
-        if (!emailInput.checkValidity()) {
-            showMessage("Please enter a valid email address.", "warning");
-            return;
-        }
-
-        saveButton.disabled = true;
-        saveButton.innerHTML =
-            '<span class="spinner-border spinner-border-sm"></span> Saving...';
-
-        try {
-            const data = await apiRequest("/api/auth/me", {
-                method: "PUT",
-                body: JSON.stringify({ name, email })
-            });
-
-            const user = data.user || data;
-
-            fillProfile(user);
-            sessionStorage.setItem("taskflowUser", JSON.stringify(user));
-
-            showMessage(data.message || "Profile updated successfully!");
-        } catch (error) {
-            showMessage(error.message, "danger");
-        } finally {
-            saveButton.disabled = false;
-            saveButton.innerHTML =
-                '<i class="bi bi-check-circle"></i> Save Changes';
-        }
-    });
-
-    document.getElementById("resetButton").addEventListener("click", function() {
-        nameInput.value = originalProfile.name;
-        emailInput.value = originalProfile.email;
-        hideMessage();
-    });
-
-    document.getElementById("logoutButton").addEventListener("click", function() {
-        sessionStorage.removeItem("taskflowToken");
-        sessionStorage.removeItem("taskflowUser");
-        window.location.href = "/login.html";
-    });
-
-    loadProfile();
-</script>
+        loadProfile();
+    </script>
 
 </body>
 </html>

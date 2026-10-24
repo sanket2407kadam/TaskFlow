@@ -4,15 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0d12">
+
     <title>Login | TaskFlow</title>
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
           rel="stylesheet">
 
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
     <style>
-        * { box-sizing: border-box; }
+        :root {
+            color-scheme: dark;
+            --bg: #0b0d12;
+            --card: #141722;
+            --border: #2b3040;
+            --text: #f3f4f8;
+            --muted: #9ca3b4;
+            --purple: #8b5cf6;
+            --cyan: #22d3ee;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             min-height: 100vh;
@@ -21,107 +48,362 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #eff6ff, #f8fafc);
+            font-family: Inter, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 10% 5%, rgba(139,92,246,.17), transparent 38%),
+                radial-gradient(ellipse at 95% 90%, rgba(34,211,238,.09), transparent 35%),
+                var(--bg);
         }
 
         .login-card {
+            position: relative;
             width: 100%;
-            max-width: 440px;
-            padding: 36px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 45px rgba(15, 23, 42, .10);
+            max-width: 445px;
+            padding: 38px;
+            overflow: hidden;
+            border: 1px solid rgba(139,92,246,.25);
+            border-radius: 23px;
+            background:
+                radial-gradient(circle at top right, rgba(139,92,246,.10), transparent 36%),
+                rgba(20,23,34,.96);
+            box-shadow: 0 25px 80px rgba(0,0,0,.38);
+            animation: appear .5s ease-out;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .brand-icon {
-            width: 54px;
-            height: 54px;
+            width: 62px;
+            height: 62px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            background: #2563eb;
-            border-radius: 15px;
-            font-size: 26px;
+            color: #fff;
+            background: linear-gradient(135deg, #8b5cf6, #6251d9);
+            border-radius: 18px;
+            font-size: 29px;
+            box-shadow: 0 10px 30px rgba(139,92,246,.27);
         }
 
-        .form-control {
-            padding: 12px 14px;
-            border-radius: 10px;
+        .brand-name {
+            margin-top: 14px;
+            color: #c4b5fd;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
-        .form-control:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .12);
+        .login-card h1 {
+            color: #f9fafb;
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: -1px;
         }
 
-        .btn-primary {
-            padding: 12px;
-            border-radius: 10px;
-            background: #2563eb;
-            border-color: #2563eb;
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .form-label {
+            margin-bottom: 9px;
+            color: #d9dce7;
+            font-size: 13px;
             font-weight: 600;
         }
 
-        .btn-primary:hover { background: #1d4ed8; }
+        .form-control {
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #34394a;
+            border-radius: 11px;
+            background: #10131c;
+            color: #f3f4f8;
+            font-size: 14px;
+        }
+
+        .form-control::placeholder {
+            color: #737b90;
+        }
+
+        .form-control:focus {
+            border-color: var(--purple);
+            background: #10131c;
+            color: #fff;
+            box-shadow: 0 0 0 .22rem rgba(139,92,246,.16);
+        }
+
+        /* Password input + eye button */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 52px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 6px;
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-50%);
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #929bb0;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color .2s, background .2s;
+        }
+
+        .toggle-password:hover {
+            background: rgba(139,92,246,.13);
+            color: var(--cyan);
+        }
+
+        .toggle-password:focus-visible {
+            outline: 2px solid var(--cyan);
+            outline-offset: 2px;
+        }
+
+        .btn-login {
+            min-height: 49px;
+            padding: 12px;
+            border: 1px solid var(--purple);
+            border-radius: 11px;
+            background: linear-gradient(135deg, #8b5cf6, #6d4aff);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 8px 22px rgba(139,92,246,.19);
+            transition: transform .2s, box-shadow .2s, opacity .2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #9b72ff, #7958ff);
+            color: white;
+            box-shadow: 0 12px 28px rgba(139,92,246,.27);
+        }
+
+        .btn-login:disabled {
+            opacity: .65;
+            transform: none;
+            cursor: wait;
+        }
+
+        .account-text {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .account-text a {
+            color: var(--cyan);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .account-text a:hover {
+            color: #a5f3fc;
+            text-decoration: underline;
+        }
+
+        .security-note {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            margin-top: 24px;
+            color: #7f899f;
+            font-size: 11px;
+        }
+
+        .security-note i {
+            color: #34d399;
+        }
+
+        .alert {
+            border-radius: 11px;
+            font-size: 13px;
+        }
+
+        .alert-success {
+            border-color: rgba(52,211,153,.3);
+            background: rgba(52,211,153,.10);
+            color: #a7f3d0;
+        }
+
+        .alert-danger {
+            border-color: rgba(251,113,133,.3);
+            background: rgba(251,113,133,.10);
+            color: #fecdd3;
+        }
 
         @media (max-width: 480px) {
-            .login-card { padding: 25px 20px; }
+            body {
+                padding: 15px;
+            }
+
+            .login-card {
+                padding: 28px 22px;
+                border-radius: 19px;
+            }
+
+            .login-card h1 {
+                font-size: 26px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition: none !important;
+            }
         }
     </style>
 </head>
 
-<body>
+<body class="bg-[#0b0d12] text-slate-100">
+
     <main class="login-card">
+
+        <!-- Branding -->
         <div class="text-center mb-4">
-            <div class="brand-icon mb-3">
-                <i class="bi bi-check2-square"></i>
+            <div class="brand-icon">
+                <i class="bi bi-check2-square" aria-hidden="true"></i>
             </div>
-            <h2 class="fw-bold mb-2">Welcome back!</h2>
-            <p class="text-secondary">Log in to continue to TaskFlow.</p>
+
+            <div class="brand-name">TaskFlow</div>
+
+            <h1 class="mt-3 mb-2">Welcome back!</h1>
+
+            <p class="subtitle mb-0">
+                Log in to continue to your workspace.
+            </p>
         </div>
 
-        <div id="message" class="alert d-none" role="alert"></div>
+        <!-- Login messages -->
+        <div id="message"
+             class="alert d-none"
+             role="alert"
+             aria-live="polite"></div>
 
+        <!-- Login form -->
         <form id="loginForm">
+
             <div class="mb-3">
-                <label for="email" class="form-label fw-semibold">
+                <label for="email" class="form-label">
                     Email address
                 </label>
-                <input type="email" id="email" class="form-control"
+
+                <input type="email"
+                       id="email"
+                       name="email"
+                       class="form-control"
                        placeholder="you@example.com"
-                       autocomplete="email" required>
+                       autocomplete="email"
+                       required>
             </div>
 
             <div class="mb-4">
-                <label for="password" class="form-label fw-semibold">
+                <label for="password" class="form-label">
                     Password
                 </label>
-                <input type="password" id="password" class="form-control"
-                       placeholder="Enter your password"
-                       autocomplete="current-password" required>
+
+                <div class="password-wrapper">
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           class="form-control"
+                           placeholder="Enter your password"
+                           autocomplete="current-password"
+                           required>
+
+                    <!-- Show/hide password -->
+                    <button type="button"
+                            class="toggle-password"
+                            id="togglePassword"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                            title="Show password">
+                        <i class="bi bi-eye" id="passwordIcon"
+                           aria-hidden="true"></i>
+                    </button>
+                </div>
             </div>
 
-            <button type="submit" id="loginButton"
-                    class="btn btn-primary w-100">
-                <i class="bi bi-box-arrow-in-right me-2"></i>Log In
+            <button type="submit"
+                    id="loginButton"
+                    class="btn btn-login w-100">
+                <i class="bi bi-box-arrow-in-right me-2"
+                   aria-hidden="true"></i>
+                Log In
             </button>
+
         </form>
 
-        <p class="text-center text-secondary mt-4 mb-0">
+        <p class="account-text text-center mt-4 mb-0">
             Don't have an account?
-            <a href="/register.html"
-               class="text-primary fw-semibold text-decoration-none">
-                Create account
-            </a>
+            <a href="/register.html">Create account</a>
         </p>
+
+        <div class="security-note">
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+            Your workspace, securely protected
+        </div>
+
     </main>
 
     <script>
         const loginForm = document.getElementById("loginForm");
         const message = document.getElementById("message");
         const loginButton = document.getElementById("loginButton");
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+        const passwordIcon = document.getElementById("passwordIcon");
+
+        // Show or hide password
+        togglePassword.addEventListener("click", function () {
+            const isHidden = passwordInput.type === "password";
+
+            passwordInput.type = isHidden ? "text" : "password";
+
+            passwordIcon.className = isHidden
+                ? "bi bi-eye-slash"
+                : "bi bi-eye";
+
+            togglePassword.setAttribute(
+                "aria-label",
+                isHidden ? "Hide password" : "Show password"
+            );
+
+            togglePassword.setAttribute(
+                "title",
+                isHidden ? "Hide password" : "Show password"
+            );
+
+            togglePassword.setAttribute(
+                "aria-pressed",
+                String(isHidden)
+            );
+        });
 
         function showMessage(text, type) {
             message.textContent = text;
@@ -132,10 +414,11 @@
             event.preventDefault();
 
             const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value;
+            const password = passwordInput.value;
 
             loginButton.disabled = true;
-            loginButton.textContent = "Logging in...";
+            loginButton.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Logging in...';
 
             try {
                 const response = await fetch("/api/auth/login", {
@@ -146,26 +429,40 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                const data = await response.json();
+                let data;
+
+                try {
+                    data = await response.json();
+                } catch {
+                    throw new Error(
+                        "The server returned an invalid response. Please try again."
+                    );
+                }
 
                 if (!response.ok) {
                     throw new Error(data.message || "Login failed.");
                 }
 
                 if (!data.token) {
-                    throw new Error("The server did not return an authentication token.");
+                    throw new Error(
+                        "The server did not return an authentication token."
+                    );
                 }
 
-                // Keep the JWT for this browser tab's session.
+                // Preserve existing session storage behavior.
                 sessionStorage.setItem("taskflowToken", data.token);
                 sessionStorage.setItem(
                     "taskflowUser",
                     JSON.stringify(data.user || {})
                 );
 
-                showMessage("Login successful! Opening TaskFlow...", "success");
+                showMessage(
+                    "Login successful! Opening TaskFlow...",
+                    "success"
+                );
 
-                setTimeout(() => {
+                // Prevent re-submission during redirect.
+                setTimeout(function () {
                     window.location.href = "/index.html";
                 }, 700);
 
@@ -174,12 +471,13 @@
                     error.message || "Unable to connect to the server.",
                     "danger"
                 );
-            } finally {
+
                 loginButton.disabled = false;
                 loginButton.innerHTML =
-                    '<i class="bi bi-box-arrow-in-right me-2"></i>Log In';
+                    '<i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Log In';
             }
         });
     </script>
+
 </body>
 </html>
